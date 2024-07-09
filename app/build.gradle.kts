@@ -45,4 +45,19 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation (libs.logging.interceptor)
+    implementation (libs.adapter.rxjava2)
+    implementation (libs.logging.interceptor.v491)
+
+    //DataStore
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.datastore.preferences)
+
+    //Glide
+    implementation (libs.glide)
+    annotationProcessor (libs.compiler)
 }
