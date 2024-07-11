@@ -1,28 +1,42 @@
 package com.example.aplikasistoryapp.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 
-object UserPreference {
-    private const val USER_TOKEN = "user_token"
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_prefs")
 
-    private lateinit var sharedPreferences: SharedPreferences
-    private val _userToken = MutableStateFlow("")
+class UserPreference private constructor(private val dataStore: DataStore<Preferences>) {
 
-    fun initialize(context: Context) {
-        sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
-        _userToken.value = sharedPreferences.getString(USER_TOKEN, "") ?: ""
+    companion object {
+        private val USER_TOKEN_KEY = stringPreferencesKey("user_token")
+
+        @Volatile
+        private var INSTANCE: UserPreference? = null
+
+        fun getInstance(dataStore: DataStore<Preferences>): UserPreference {
+            return INSTANCE ?: synchronized(this) {
+                val instance = UserPreference(dataStore)
+                INSTANCE = instance
+                instance
+            }
+        }
     }
 
-    fun setUserToken(token: String) {
-        _userToken.value = token
-        sharedPreferences.edit().putString(USER_TOKEN, token).apply()
+    fun getUserToken(): Flow<String> {
+        return dataStore.data.map { preferences ->
+            preferences[USER_TOKEN_KEY] ?: ""
+        }
     }
 
-    fun getUserToken() = _userToken.asStateFlow()
+    suspend fun setUserToken(token: String) {
+        dataStore.edit { preferences ->
+            preferences[USER_TOKEN_KEY] = token
+        }
+    }
 }

@@ -7,4 +7,6 @@
     <string name="register_button">Register</string>
     <string name="hint_name">Name</string>
     <string name="logo_dicoding">logo_dicoding</string>
+    <string name="photo">image</string>
+    <string name="loading">loading</string>
 </resources>

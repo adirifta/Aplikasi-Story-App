@@ -3,12 +3,14 @@ package com.example.aplikasistoryapp.data
 import android.content.Context
 import com.example.aplikasistoryapp.data.repository.StoryRepository
 import com.example.aplikasistoryapp.data.retrofit.ApiConfig
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 object Injection {
     fun provideRepository(context: Context): StoryRepository {
-        UserPreference.initialize(context)
-        val apiService = ApiConfig.getApiService(UserPreference.getUserToken().value)
-        return StoryRepository(apiService)
+        val pref = UserPreference.getInstance(context.dataStore)
+        val userToken = runBlocking { pref.getUserToken().first() }
+        val apiService = ApiConfig.getApiService(userToken)
+        return StoryRepository.getInstance(apiService)
     }
 }

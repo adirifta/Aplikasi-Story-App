@@ -1,28 +1,29 @@
 package com.example.aplikasistoryapp.ui
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.repository.UserRepository
 import com.example.aplikasistoryapp.data.retrofit.ApiConfig
-import com.example.aplikasistoryapp.ui.viewmodel.AuthViewModel
-import com.example.aplikasistoryapp.ui.viewmodel.AuthViewModelFactory
+import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.RegisterViewModelFactory
+import com.example.aplikasistoryapp.ui.viewmodel.RegisterViewModel
 
 class RegisterActivity : AppCompatActivity() {
 
-    private val authViewModel: AuthViewModel by viewModels {
-        AuthViewModelFactory(UserRepository(ApiConfig.getApiService("")))
+    private val registerViewModel: RegisterViewModel by viewModels {
+        RegisterViewModelFactory(UserRepository(ApiConfig.getApiService("")))
     }
 
     private lateinit var edRegisterName: EditText
     private lateinit var edRegisterEmail: EditText
     private lateinit var edRegisterPassword: EditText
     private lateinit var btnRegister: Button
+    private lateinit var loadingLayout: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +33,7 @@ class RegisterActivity : AppCompatActivity() {
         edRegisterEmail = findViewById(R.id.ed_register_email)
         edRegisterPassword = findViewById(R.id.ed_register_password)
         btnRegister = findViewById(R.id.btn_register)
+        loadingLayout = findViewById(R.id.loading_layout)
 
         btnRegister.setOnClickListener {
             val name = edRegisterName.text.toString()
@@ -39,22 +41,30 @@ class RegisterActivity : AppCompatActivity() {
             val password = edRegisterPassword.text.toString()
 
             if (validateInput(name, email, password)) {
-                authViewModel.register(name, email, password)
+                registerViewModel.register(name, email, password)
             }
         }
 
-        authViewModel.registerResponse.observe(this, Observer { response ->
+        registerViewModel.registerResponse.observe(this) { response ->
             if (response.error == true) {
                 Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
                 finish()
             }
-        })
+        }
 
-        authViewModel.errorMessage.observe(this, Observer { message ->
+        registerViewModel.errorMessage.observe(this) { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        })
+        }
+
+        registerViewModel.isLoading.observe(this) { isLoading ->
+            loadingLayout.visibility = if (isLoading) View.VISIBLE else View.GONE
+            btnRegister.isEnabled = !isLoading
+            edRegisterName.isEnabled = !isLoading
+            edRegisterEmail.isEnabled = !isLoading
+            edRegisterPassword.isEnabled = !isLoading
+        }
     }
 
     private fun validateInput(name: String, email: String, password: String): Boolean {

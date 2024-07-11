@@ -1,8 +1,9 @@
-package com.example.aplikasistoryapp.ui.viewmodel
+package com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplikasistoryapp.data.repository.UserRepository
+import com.example.aplikasistoryapp.ui.viewmodel.AuthViewModel
 
 class AuthViewModelFactory(private val userRepository: UserRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -1,6 +1,6 @@
 package com.example.aplikasistoryapp.data.retrofit
 
-import kotlinx.coroutines.runBlocking
+import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -12,6 +12,7 @@ object ApiConfig {
         val loggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
         val authInterceptor = Interceptor { chain ->
             val req = chain.request()
+            Log.d("ApiConfig", "Adding token to header: Bearer $token")
             val requestHeaders = req.newBuilder()
                 .addHeader("Authorization", "Bearer $token")
                 .build()

@@ -28,9 +28,10 @@
         </activity>
         <activity
             android:name=".AddStoryActivity"
-            android:exported="false" /> <!-- <activity -->
-        <!-- android:name=".DetailActivity" -->
-        <!-- android:exported="false" /> -->
+            android:exported="false" />
+         <activity
+         android:name=".DetailActivity"
+         android:exported="false" />
         <activity
             android:name=".ui.RegisterActivity"
             android:exported="false" />
