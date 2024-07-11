@@ -2,6 +2,7 @@ package com.example.aplikasistoryapp.data.retrofit
 
 import com.example.aplikasistoryapp.data.response.LoginResponse
 import com.example.aplikasistoryapp.data.response.RegisterResponse
+import com.example.aplikasistoryapp.data.response.StoryDetailResponse
 import com.example.aplikasistoryapp.data.response.StoryResponse
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -30,5 +31,5 @@ interface ApiService {
     suspend fun getStories(): StoryResponse
 
     @GET("stories/{id}")
-    suspend fun getStoryDetail(@Path("id") id: String): StoryResponse
+    suspend fun getStoryDetail(@Path("id") id: String): StoryDetailResponse
 }

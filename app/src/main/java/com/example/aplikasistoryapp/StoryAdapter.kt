@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.aplikasistoryapp.data.response.ListStoryItem
 
-class StoryAdapter : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(StoryDiffCallback()) {
+class StoryAdapter(private val onItemClick: (ListStoryItem) -> Unit) : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(StoryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_story, parent, false)
@@ -20,7 +20,7 @@ class StoryAdapter : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(St
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
         val story = getItem(position)
-        holder.bind(story)
+        holder.bind(story, onItemClick)
     }
 
     class StoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -28,12 +28,16 @@ class StoryAdapter : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(St
         private val name: TextView = itemView.findViewById(R.id.tv_item_name)
         private val description: TextView = itemView.findViewById(R.id.tv_item_description)
 
-        fun bind(story: ListStoryItem) {
+        fun bind(story: ListStoryItem, onItemClick: (ListStoryItem) -> Unit) {
             name.text = story.name
             description.text = story.description
             Glide.with(itemView.context)
                 .load(story.photoUrl)
                 .into(photo)
+
+            itemView.setOnClickListener {
+                onItemClick(story)
+            }
         }
     }
 

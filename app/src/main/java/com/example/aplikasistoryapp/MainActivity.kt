@@ -38,7 +38,13 @@ class MainActivity : AppCompatActivity() {
 
         loadingLayout = findViewById(R.id.loading_layout)
 
-        storyAdapter = StoryAdapter()
+        storyAdapter = StoryAdapter { story ->
+            val intent = Intent(this, DetailActivity::class.java)
+            intent.putExtra(DetailActivity.EXTRA_STORY_ID, story.id)
+            intent.putExtra(DetailActivity.EXTRA_TOKEN, runBlocking { UserPreference.getInstance(dataStore).getUserToken().first() })
+            startActivity(intent)
+        }
+
         recyclerView.adapter = storyAdapter
 
         if (!isLoggedIn()) {
@@ -84,26 +90,4 @@ class MainActivity : AppCompatActivity() {
             recyclerView.visibility = View.VISIBLE
         }
     }
-
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        menuInflater.inflate(R.menu.main_menu, menu)
-//        return true
-//    }
-
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            R.id.action_logout -> {
-//                logout()
-//                true
-//            }
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
-
-//    private fun logout() {
-//        val editor = preferences.edit()
-//        editor.clear()
-//        editor.apply()
-//        navigateToLogin()
-//    }
 }
