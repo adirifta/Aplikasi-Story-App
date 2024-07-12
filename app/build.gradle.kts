@@ -61,4 +61,7 @@ dependencies {
     implementation (libs.glide)
     annotationProcessor (libs.compiler)
     implementation (libs.kotlinx.coroutines.android)
+
+    implementation (libs.okhttp)
+    implementation (libs.logging.interceptor.v490)
 }

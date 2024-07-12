@@ -1,4 +1,4 @@
-package com.example.aplikasistoryapp
+package com.example.aplikasistoryapp.ui
 
 import android.os.Bundle
 import android.util.Log
@@ -7,8 +7,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.retrofit.ApiConfig
-import com.example.aplikasistoryapp.data.response.ListStoryItem
 import com.example.aplikasistoryapp.data.response.Story
 import kotlinx.coroutines.launch
 
