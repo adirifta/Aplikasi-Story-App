@@ -1,5 +1,7 @@
-package com.example.aplikasistoryapp.ui
+package com.example.aplikasistoryapp.ui.activity
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -15,12 +17,14 @@ import com.example.aplikasistoryapp.data.UserPreference
 import com.example.aplikasistoryapp.data.dataStore
 import com.example.aplikasistoryapp.data.repository.UserRepository
 import com.example.aplikasistoryapp.data.retrofit.ApiConfig
+import com.example.aplikasistoryapp.databinding.ActivityLoginBinding
 import com.example.aplikasistoryapp.ui.viewmodel.LoginViewModel
 import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.LoginViewModelFactory
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityLoginBinding
     private val loginViewModel: LoginViewModel by viewModels {
         LoginViewModelFactory(UserRepository(ApiConfig.getApiService("")))
     }
@@ -32,7 +36,8 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         edLoginEmail = findViewById(R.id.ed_login_email)
         edLoginPassword = findViewById(R.id.ed_login_password)
@@ -67,6 +72,8 @@ class LoginActivity : AppCompatActivity() {
             loadingLayout.visibility = if (isLoading) View.VISIBLE else View.GONE
             btnLogin.isEnabled = !isLoading
         }
+
+        playAnimation()
     }
 
     private fun validateInput(email: String, password: String): Boolean {
@@ -83,5 +90,24 @@ class LoginActivity : AppCompatActivity() {
     private fun navigateToMain() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        val titleAnimator = ObjectAnimator.ofFloat(binding.titleTextView, View.ALPHA, 1f).setDuration(500)
+        val emailAnimator = ObjectAnimator.ofFloat(binding.edLoginEmail, View.ALPHA, 1f).setDuration(1000)
+        val passwordAnimator = ObjectAnimator.ofFloat(binding.edLoginPassword, View.ALPHA, 1f).setDuration(1000)
+        val loginButtonAnimator = ObjectAnimator.ofFloat(binding.btnLogin, View.ALPHA, 1f).setDuration(500)
+
+
+        AnimatorSet().apply {
+            playSequentially(titleAnimator, emailAnimator, passwordAnimator, loginButtonAnimator)
+            start()
+        }
     }
 }

@@ -1,5 +1,6 @@
-package com.example.aplikasistoryapp.ui
+package com.example.aplikasistoryapp.ui.activity
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
@@ -11,11 +12,15 @@ import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.retrofit.ApiConfig
 import com.example.aplikasistoryapp.data.response.Story
 import kotlinx.coroutines.launch
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var photo: ImageView
     private lateinit var name: TextView
     private lateinit var description: TextView
+    private lateinit var createdAt: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +29,7 @@ class DetailActivity : AppCompatActivity() {
         photo = findViewById(R.id.iv_detail_photo)
         name = findViewById(R.id.tv_detail_name)
         description = findViewById(R.id.tv_detail_description)
+        createdAt = findViewById(R.id.tv_detail_created_at)
 
         // Fetching story by ID
         val storyId = intent.getStringExtra(EXTRA_STORY_ID)
@@ -52,12 +58,23 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun bind(story: Story) {
         name.text = story.name
-        description.text = story.description
+        description.text = "\t${story.description?.replace("\n", "\n\t")}"
         Glide.with(this)
             .load(story.photoUrl)
             .into(photo)
+
+        try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("dd MMMM yyyy 'at' HH:mm", Locale.getDefault())
+            val formattedDate = story.createdAt?.let { inputFormat.parse(it) }
+            createdAt.text = formattedDate?.let { outputFormat.format(it) }
+        } catch (e: ParseException) {
+            Log.e("DetailActivity", "Error parsing date", e)
+            createdAt.text = story.createdAt // fallback to original string if parsing fails
+        }
     }
 
     companion object {

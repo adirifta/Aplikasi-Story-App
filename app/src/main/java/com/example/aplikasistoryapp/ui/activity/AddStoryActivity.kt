@@ -1,6 +1,8 @@
-package com.example.aplikasistoryapp.ui
+package com.example.aplikasistoryapp.ui.activity
 
 import android.Manifest
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -26,13 +28,13 @@ import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.Injection
 import com.example.aplikasistoryapp.data.UserPreference
 import com.example.aplikasistoryapp.data.dataStore
+import com.example.aplikasistoryapp.databinding.ActivityAddStoryBinding
 import com.example.aplikasistoryapp.ui.viewmodel.AddStoryViewModel
 import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.AddViewModelFactory
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
@@ -52,13 +54,16 @@ class AddStoryActivity : AppCompatActivity() {
     private var currentPhotoPath: String? = null
     private lateinit var loadingLayout: View
 
+    private lateinit var binding: ActivityAddStoryBinding
+
     private val addStoryViewModel: AddStoryViewModel by viewModels {
         AddViewModelFactory(Injection.provideRepository(this))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_story)
+        binding = ActivityAddStoryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         descriptionEditText = findViewById(R.id.ed_add_description)
         addPhotoImageView = findViewById(R.id.iv_add_photo)
@@ -77,6 +82,13 @@ class AddStoryActivity : AppCompatActivity() {
 
         addButton.setOnClickListener {
             uploadStory()
+        }
+
+        playAnimation()
+
+        val backButton: ImageView = findViewById(R.id.backButton)
+        backButton.setOnClickListener {
+            finish()
         }
     }
 
@@ -226,5 +238,17 @@ class AddStoryActivity : AppCompatActivity() {
     companion object {
         private const val MAX_PHOTO_SIZE = 1 * 1024 * 1024 // 1MB
         private const val REQUEST_CAMERA_PERMISSION = 101
+    }
+
+    private fun playAnimation() {
+        val textTitleAnimator = ObjectAnimator.ofFloat(binding.edAddDescription, View.ALPHA, 0f, 1f).setDuration(1000)
+        val galleryButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAddGallery, View.ALPHA, 0f, 1f).setDuration(1400)
+        val cameraButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAddCamera, View.ALPHA, 0f, 1f).setDuration(1600)
+        val addButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAdd, View.ALPHA, 0f, 1f).setDuration(2000)
+
+        AnimatorSet().apply {
+            playTogether(textTitleAnimator, galleryButtonAnimator, cameraButtonAnimator, addButtonAnimator)
+            start()
+        }
     }
 }

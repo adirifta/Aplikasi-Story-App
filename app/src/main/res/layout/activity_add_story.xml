@@ -1,60 +1,135 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/whiteBG"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue"
+        android:paddingStart="50dp"
+        android:paddingEnd="10dp"
+        tools:ignore="MissingConstraints,RtlSymmetry">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:text="@string/add_story"
+            android:textColor="@color/whiteBG"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_back"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:contentDescription="@string/back_button_description"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
     <LinearLayout
+        android:id="@id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
-
-        <EditText
-            android:id="@+id/ed_add_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Description"
-            android:inputType="textMultiLine"
-            android:minLines="3"
-            android:maxLines="5" />
+        android:padding="16dp"
+        tools:ignore="MissingConstraints">
 
         <ImageView
             android:id="@+id/iv_add_photo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher_background"
+            android:src="@drawable/ic_image"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             android:layout_marginTop="16dp"
-            android:contentDescription="Added Photo" />
+            android:contentDescription="@string/add_image" />
+
+        <EditText
+            android:id="@+id/ed_add_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/description"
+            android:inputType="textMultiLine"
+            android:alpha="0"
+            android:minLines="3"
+            android:maxLines="5"
+            tools:alpha="100" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/container"
+        android:weightSum="2"
+        tools:ignore="MissingConstraints">
 
         <Button
             android:id="@+id/button_add_gallery"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add Photo from Gallery"
-            android:layout_marginTop="16dp" />
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:alpha="0"
+            android:layout_marginEnd="3dp"
+            android:backgroundTint="@color/blue"
+            android:text="@string/gallery_button"
+            android:textColor="@color/whiteBG"
+            tools:alpha="100"
+            tools:ignore="ButtonStyle" />
 
         <Button
             android:id="@+id/button_add_camera"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add Photo from Camera"
-            android:layout_marginTop="16dp" />
-
-        <Button
-            android:id="@+id/button_add"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add Story"
-            android:layout_marginTop="16dp" />
-
-        <include
-            android:id="@+id/loading_layout"
-            layout="@layout/loading_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:layout_marginStart="3dp"
+            android:alpha="0"
+            android:backgroundTint="@color/blue"
+            android:text="@string/camera_button"
+            android:textColor="@color/whiteBG"
+            tools:alpha="100"
+            tools:ignore="ButtonStyle" />
     </LinearLayout>
-</ScrollView>
+
+    <Button
+        android:id="@+id/button_add"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="15dp"
+        android:alpha="0"
+        android:backgroundTint="@color/blue"
+        android:text="@string/add_story"
+        android:textColor="@color/whiteBG"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_container"
+        tools:alpha="100" />
+
+    <include
+        android:id="@+id/loading_layout"
+        layout="@layout/loading_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

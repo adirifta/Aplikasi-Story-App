@@ -26,6 +26,9 @@ android {
             )
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -64,4 +67,9 @@ dependencies {
 
     implementation (libs.okhttp)
     implementation (libs.logging.interceptor.v490)
+
+    //Lottie Animation
+    implementation (libs.lottie)
+
+    implementation (libs.justifiedtextview)
 }

@@ -1,5 +1,7 @@
-package com.example.aplikasistoryapp.ui
+package com.example.aplikasistoryapp.ui.activity
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.repository.UserRepository
 import com.example.aplikasistoryapp.data.retrofit.ApiConfig
+import com.example.aplikasistoryapp.databinding.ActivityRegisterBinding
 import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.RegisterViewModelFactory
 import com.example.aplikasistoryapp.ui.viewmodel.RegisterViewModel
 
@@ -19,6 +22,8 @@ class RegisterActivity : AppCompatActivity() {
         RegisterViewModelFactory(UserRepository(ApiConfig.getApiService("")))
     }
 
+    private lateinit var binding: ActivityRegisterBinding
+
     private lateinit var edRegisterName: EditText
     private lateinit var edRegisterEmail: EditText
     private lateinit var edRegisterPassword: EditText
@@ -27,7 +32,8 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
+        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         edRegisterName = findViewById(R.id.ed_register_name)
         edRegisterEmail = findViewById(R.id.ed_register_email)
@@ -35,7 +41,7 @@ class RegisterActivity : AppCompatActivity() {
         btnRegister = findViewById(R.id.btn_register)
         loadingLayout = findViewById(R.id.loading_layout)
 
-        btnRegister.setOnClickListener {
+        binding.btnRegister.setOnClickListener {
             val name = edRegisterName.text.toString()
             val email = edRegisterEmail.text.toString()
             val password = edRegisterPassword.text.toString()
@@ -54,8 +60,8 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        registerViewModel.errorMessage.observe(this) { message ->
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        registerViewModel.errorMessage.observe(this) {
+            Toast.makeText(this, "Email is already taken", Toast.LENGTH_SHORT).show()
         }
 
         registerViewModel.isLoading.observe(this) { isLoading ->
@@ -65,6 +71,8 @@ class RegisterActivity : AppCompatActivity() {
             edRegisterEmail.isEnabled = !isLoading
             edRegisterPassword.isEnabled = !isLoading
         }
+
+        playAnimation()
     }
 
     private fun validateInput(name: String, email: String, password: String): Boolean {
@@ -78,4 +86,29 @@ class RegisterActivity : AppCompatActivity() {
         }
         return true
     }
+
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        val title = ObjectAnimator.ofFloat(binding.titleTextView, View.ALPHA, 1f).setDuration(500)
+        val registerName = ObjectAnimator.ofFloat(binding.edRegisterName, View.ALPHA, 1f).setDuration(900)
+        val registerEmail = ObjectAnimator.ofFloat(binding.edRegisterEmail, View.ALPHA, 1f).setDuration(900)
+        val registerPassword = ObjectAnimator.ofFloat(binding.edRegisterPassword, View.ALPHA, 1f).setDuration(900)
+        val register = ObjectAnimator.ofFloat(binding.btnRegister, View.ALPHA, 1f).setDuration(900)
+
+        val together = AnimatorSet().apply {
+            playTogether(register)
+        }
+
+        AnimatorSet().apply {
+            playSequentially(title, registerName, registerEmail, registerPassword, together)
+            start()
+        }
+    }
+
+    fun togglePasswordVisibility(view: View) {}
 }
