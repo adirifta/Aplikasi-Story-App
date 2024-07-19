@@ -1,7 +1,7 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Aplikasi Story App</string>
     <string name="welcome_message">Welcome to Aplikasi Story</string>
-    <string name="email_hint">Email</string>
+    <string name="email_hint" >Email</string>
     <string name="password_hint">Password</string>
     <string name="login_button">Login</string>
     <string name="register_button">Register</string>
@@ -11,9 +11,9 @@
     <string name="image">Image</string>
     <string name="description">Description</string>
     <string name="add_image">Add Image</string>
-    <string name="show_more">Show more</string>
-    <string name="logo_dicoding">logo_dicoding</string>
-    <string name="photo">image</string>
+    <string name="show_more" tools:ignore="UnusedResources">Show more</string>
+    <string name="ic_logo">logo</string>
+    <string name="photo" tools:ignore="UnusedResources">image</string>
     <string name="loading">loading</string>
     <string name="story_app">Story App</string>
     <string name="settings">Settings</string>
@@ -22,4 +22,8 @@
     <string name="gallery_button">Gallery</string>
     <string name="back_button_description">Back</string>
     <string name="message_welcome_page">Exciting, inspiring and meaningful stories at your fingertips.</string>
+    <string name="add_widget" tools:ignore="UnusedResources">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="item_widget">Item widget</string>
+    <string name="empty_text">NO DATA</string>
 </resources>

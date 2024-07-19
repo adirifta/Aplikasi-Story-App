@@ -221,6 +221,8 @@ class AddStoryActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e("AddStoryActivity", "Error uploading story", e)
                 Toast.makeText(this@AddStoryActivity, "Error uploading story", Toast.LENGTH_SHORT).show()
+            } finally {
+                showLoading(false)
             }
         }
     }

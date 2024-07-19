@@ -110,5 +110,4 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    fun togglePasswordVisibility(view: View) {}
 }

@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:textColor="@color/abu_abu"
+            android:textColor="@color/abu_hint"
             android:paddingBottom="8dp"
             tools:text="@string/story_date" />
 

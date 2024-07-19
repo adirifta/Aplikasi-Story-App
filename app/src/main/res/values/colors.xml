@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="whiteBG">#F9F7F7</color>
     <color name="blue">#3F72AF</color>
     <color name="abu_abu">#DBE2EF</color>
     <color name="abu_hint">#8785A2</color>
-<!--    <color name="colorPrimary">#2196F3</color>-->
-<!--    <color name="colorAccent">#FF4081</color>-->
+    <color name="light_blue_50" tools:ignore="UnusedResources">#FFE1F5FE</color>
+    <color name="light_blue_200" tools:ignore="UnusedResources">#FF81D4FA</color>
+    <color name="light_blue_600" tools:ignore="UnusedResources">#FF039BE5</color>
+    <color name="light_blue_900" tools:ignore="UnusedResources">#FF01579B</color>
+    <!--    <color name="colorPrimary">#2196F3</color>-->
+    <!--    <color name="colorAccent">#FF4081</color>-->
 </resources>

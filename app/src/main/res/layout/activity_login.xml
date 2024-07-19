@@ -77,7 +77,6 @@
         android:padding="12dp"
         android:alpha="0"
         android:drawableEnd="@drawable/ic_visibility_off"
-        android:onClick="togglePasswordVisibility"
         app:layout_constraintTop_toBottomOf="@+id/ed_login_email"
         tools:alpha="100"
         tools:ignore="Autofill" />

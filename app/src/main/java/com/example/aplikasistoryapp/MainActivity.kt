@@ -2,6 +2,7 @@ package com.example.aplikasistoryapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.action_settings -> {
                     val intent = Intent(this, SettingsActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
                     true
                 }
 //                R.id.action_favorite -> {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Aplikasi Story App</string>
+    <string name="welcome_message">Welcome to Aplikasi Story</string>
+    <string name="email_hint">Surel</string>
+    <string name="password_hint">Kata sandi</string>
+    <string name="login_button">Masuk</string>
+    <string name="register_button">Register</string>
+    <string name="hint_name">Nama</string>
+    <string name="story_title">Judul Cerita</string>
+    <string name="story_date">Tanggal Cerita</string>
+    <string name="image">Gambar</string>
+    <string name="description">Deskripsi</string>
+    <string name="add_image">Masukkan Gambar</string>
+    <string name="show_more">Tampilkan</string>
+    <string name="ic_logo">logo</string>
+    <string name="photo">Gambar</string>
+    <string name="loading">Memuat</string>
+    <string name="story_app">Story App</string>
+    <string name="settings">Setting</string>
+    <string name="add_story">Masukkan Cerita</string>
+    <string name="camera_button">Kamera</string>
+    <string name="gallery_button">Gallery</string>
+    <string name="back_button_description">Kembali</string>
+    <string name="message_welcome_page">Exciting, inspiring and meaningful stories at your fingertips.</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="empty_text">NO DATA</string>
+    <string name="item_widget">Item widget</string>
+</resources>

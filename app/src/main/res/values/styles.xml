@@ -1,0 +1,6 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Widget.AplikasiStoryApp.AppWidget.Container" parent="android:Widget" tools:ignore="UnusedResources" />
+
+    <style name="Widget.AplikasiStoryApp.AppWidget.InnerView" parent="android:Widget" tools:ignore="UnusedResources" />
+</resources>
