@@ -17,6 +17,8 @@
     <string name="loading">loading</string>
     <string name="story_app">Story App</string>
     <string name="settings">Settings</string>
+    <string name="logout">Logout</string>
+    <string name="language">Select a language</string>
     <string name="add_story">Add Story</string>
     <string name="camera_button">Camera</string>
     <string name="gallery_button">Gallery</string>

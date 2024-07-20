@@ -90,6 +90,16 @@ class AddStoryActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             finish()
         }
+
+        addStoryViewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
+
+        addStoryViewModel.errorMessage.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(this, "Error: $it", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun openGallery() {
@@ -244,12 +254,12 @@ class AddStoryActivity : AppCompatActivity() {
 
     private fun playAnimation() {
         val textTitleAnimator = ObjectAnimator.ofFloat(binding.edAddDescription, View.ALPHA, 0f, 1f).setDuration(1000)
-        val galleryButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAddGallery, View.ALPHA, 0f, 1f).setDuration(1400)
-        val cameraButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAddCamera, View.ALPHA, 0f, 1f).setDuration(1600)
-        val addButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAdd, View.ALPHA, 0f, 1f).setDuration(2000)
+        val galleryButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAddGallery, View.ALPHA, 0f, 1f).setDuration(1000)
+        val cameraButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAddCamera, View.ALPHA, 0f, 1f).setDuration(1000)
+        val addButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAdd, View.ALPHA, 0f, 1f).setDuration(1000)
 
         AnimatorSet().apply {
-            playTogether(textTitleAnimator, galleryButtonAnimator, cameraButtonAnimator, addButtonAnimator)
+            playSequentially(textTitleAnimator, galleryButtonAnimator, cameraButtonAnimator, addButtonAnimator)
             start()
         }
     }

@@ -2,7 +2,6 @@ package com.example.aplikasistoryapp.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
@@ -59,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.action_settings -> {
                     val intent = Intent(this, SettingsActivity::class.java)
-                    startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
+                    startActivity(intent)
                     true
                 }
                 else -> false
