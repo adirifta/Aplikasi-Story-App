@@ -28,7 +28,7 @@
         android:theme="@style/Theme.AplikasiStoryApp"
         tools:targetApi="31">
         <receiver
-            android:name=".StoryListWidget"
+            android:name=".ui.widget.StoryListWidget"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -67,7 +67,7 @@
             android:name=".ui.activity.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="false" />
 
         <provider
@@ -80,7 +80,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
         <service
-            android:name="com.example.aplikasistoryapp.StackWidgetService"
+            android:name="com.example.aplikasistoryapp.ui.widget.StackWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 

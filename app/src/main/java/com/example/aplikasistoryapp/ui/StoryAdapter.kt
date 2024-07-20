@@ -1,4 +1,4 @@
-package com.example.aplikasistoryapp
+package com.example.aplikasistoryapp.ui
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,9 +9,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.response.ListStoryItem
 
-class StoryAdapter(private val onItemClick: (ListStoryItem) -> Unit) : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(StoryDiffCallback()) {
+class StoryAdapter(private val onItemClick: (ListStoryItem) -> Unit) : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(
+    StoryDiffCallback()
+) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_story, parent, false)

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Aplikasi Story App</string>
-    <string name="welcome_message">Welcome to Aplikasi Story</string>
+    <string name="app_name">Aplikasi Cerita</string>
+    <string name="welcome_message">Selamat Datang di Aplikasi Cerita</string>
     <string name="email_hint">Surel</string>
     <string name="password_hint">Kata sandi</string>
     <string name="login_button">Masuk</string>
-    <string name="register_button">Register</string>
+    <string name="register_button">Daftar</string>
     <string name="hint_name">Nama</string>
     <string name="story_title">Judul Cerita</string>
     <string name="story_date">Tanggal Cerita</string>

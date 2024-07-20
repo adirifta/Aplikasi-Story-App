@@ -11,7 +11,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.aplikasistoryapp.MainActivity
+import com.example.aplikasistoryapp.ui.MainActivity
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.UserPreference
 import com.example.aplikasistoryapp.data.dataStore

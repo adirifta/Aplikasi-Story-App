@@ -1,13 +1,15 @@
-package com.example.aplikasistoryapp
+package com.example.aplikasistoryapp.ui
 
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.View
+import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.Injection
 import com.example.aplikasistoryapp.data.UserPreference
 import com.example.aplikasistoryapp.data.dataStore
@@ -20,13 +22,13 @@ import com.example.aplikasistoryapp.ui.viewmodel.StoryViewModel
 import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.ViewModelFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var storyAdapter: StoryAdapter
+    private lateinit var loadingIndicator: ProgressBar
 
     private val storyViewModel: StoryViewModel by viewModels {
         ViewModelFactory(Injection.provideRepository(this))
@@ -37,6 +39,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        loadingIndicator = findViewById(R.id.loadingIndicator)
+        loadingIndicator.visibility = View.VISIBLE
         setupRecyclerView()
 
         if (!isLoggedIn()) {
@@ -58,11 +62,6 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
                     true
                 }
-//                R.id.action_favorite -> {
-//                    val intent = Intent(this, FavoriteActivity::class.java)
-//                    startActivity(intent)
-//                    true
-//                }
                 else -> false
             }
         }
@@ -85,16 +84,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeStories() {
-        lifecycleScope.launch {
-            storyViewModel.fetchStories()
-            storyViewModel.stories.collect { storyResponse ->
-                storyResponse?.let {
-                    Log.d("MainActivity", "Stories received: ${storyResponse.listStory.size}")
-                    storyAdapter.submitList(storyResponse.listStory)
-//                    showLoading(false)
-                }
+        storyViewModel.stories.observe(this) { storyResponse ->
+            loadingIndicator.visibility = View.GONE
+            storyResponse?.let {
+                Log.d("MainActivity", "Stories received: ${storyResponse.listStory.size}")
+                storyAdapter.submitList(storyResponse.listStory)
             }
         }
+
+        storyViewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading) {
+                loadingIndicator.visibility = View.VISIBLE
+            } else {
+                loadingIndicator.visibility = View.GONE
+            }
+        }
+
+        storyViewModel.fetchStories()
     }
 
     private fun isLoggedIn(): Boolean {
@@ -108,16 +114,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
-//    private fun showLoading(isLoading: Boolean) {
-//        if (isLoading) {
-//            binding.loadingLayout.visibility = View.VISIBLE
-//            binding.recyclerView.visibility = View.GONE
-//        } else {
-//            binding.loadingLayout.visibility = View.GONE
-//            binding.recyclerView.visibility = View.VISIBLE
-//        }
-//    }
 
     companion object {
         private const val ADD_STORY_REQUEST_CODE = 1

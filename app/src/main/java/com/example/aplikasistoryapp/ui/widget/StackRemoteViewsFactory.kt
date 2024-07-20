@@ -1,4 +1,4 @@
-package com.example.aplikasistoryapp
+package com.example.aplikasistoryapp.ui.widget
 
 import android.content.Context
 import android.content.Intent
@@ -8,6 +8,7 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.core.os.bundleOf
 import com.bumptech.glide.Glide
+import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.repository.StoryRepository
 import com.example.aplikasistoryapp.data.retrofit.ApiConfig
 import com.example.aplikasistoryapp.data.response.ListStoryItem
