@@ -3,15 +3,16 @@ package com.example.aplikasistoryapp.ui.activity
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.aplikasistoryapp.R
-import com.example.aplikasistoryapp.data.retrofit.ApiConfig
 import com.example.aplikasistoryapp.data.response.Story
-import kotlinx.coroutines.launch
+import com.example.aplikasistoryapp.ui.viewmodel.DetailViewModel
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -21,6 +22,9 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var name: TextView
     private lateinit var description: TextView
     private lateinit var createdAt: TextView
+    private lateinit var loadingIndicator: ProgressBar
+
+    private val viewModel: DetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,30 +34,28 @@ class DetailActivity : AppCompatActivity() {
         name = findViewById(R.id.tv_detail_name)
         description = findViewById(R.id.tv_detail_description)
         createdAt = findViewById(R.id.tv_detail_created_at)
+        loadingIndicator = findViewById(R.id.loadingIndicator)
 
-        // Fetching story by ID
         val storyId = intent.getStringExtra(EXTRA_STORY_ID)
         val token = intent.getStringExtra(EXTRA_TOKEN)
         if (storyId != null && token != null) {
-            fetchStoryDetail(storyId, token)
+            viewModel.fetchStoryDetail(storyId, token)
         }
-    }
 
-    private fun fetchStoryDetail(storyId: String, token: String) {
-        Log.d("DetailActivity", "Fetching story detail with token: $token")
-        lifecycleScope.launch {
-            try {
-                val apiService = ApiConfig.getApiService(token)
-                val response = apiService.getStoryDetail(storyId)
-                if (response.error) {
-                    Log.e("DetailActivity", "Error fetching story: ${response.message}")
-                } else {
-                    response.story?.let {
-                        bind(it)
-                    } ?: Log.e("DetailActivity", "Story not found")
-                }
-            } catch (e: Exception) {
-                Log.e("DetailActivity", "Exception fetching story", e)
+        // Observe LiveData
+        viewModel.story.observe(this) { story ->
+            story?.let {
+                bind(it)
+            }
+        }
+
+        viewModel.loading.observe(this) { isLoading ->
+            loadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        viewModel.error.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Log.e("DetailActivity", "Error: $it")
             }
         }
     }
