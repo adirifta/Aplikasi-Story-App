@@ -3,32 +3,33 @@ package com.example.aplikasistoryapp.ui.activity
 import android.Manifest
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.Injection
 import com.example.aplikasistoryapp.data.UserPreference
 import com.example.aplikasistoryapp.data.dataStore
 import com.example.aplikasistoryapp.databinding.ActivityAddStoryBinding
+import com.example.aplikasistoryapp.ui.getImageUri
 import com.example.aplikasistoryapp.ui.viewmodel.AddStoryViewModel
 import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.AddViewModelFactory
 import kotlinx.coroutines.flow.firstOrNull
@@ -38,10 +39,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
-import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
 class AddStoryActivity : AppCompatActivity() {
 
@@ -51,13 +48,20 @@ class AddStoryActivity : AppCompatActivity() {
     private lateinit var addCameraButton: Button
     private lateinit var addButton: Button
     private var photoUri: Uri? = null
-    private var currentPhotoPath: String? = null
-    private lateinit var loadingLayout: View
+    private lateinit var loadingIndicator: ProgressBar
 
     private lateinit var binding: ActivityAddStoryBinding
 
     private val addStoryViewModel: AddStoryViewModel by viewModels {
         AddViewModelFactory(Injection.provideRepository(this))
+    }
+
+    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
+        if (isSuccess) {
+            addPhotoImageView.setImageURI(photoUri)
+        } else {
+            photoUri = null
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,14 +74,19 @@ class AddStoryActivity : AppCompatActivity() {
         addGalleryButton = findViewById(R.id.button_add_gallery)
         addCameraButton = findViewById(R.id.button_add_camera)
         addButton = findViewById(R.id.button_add)
-        loadingLayout = findViewById(R.id.loading_layout)
+        loadingIndicator = findViewById(R.id.loadingIndicator)
+        loadingIndicator.visibility = View.GONE
 
         addGalleryButton.setOnClickListener {
             openGallery()
         }
 
         addCameraButton.setOnClickListener {
-            openCamera()
+            if (hasCameraPermission()) {
+                openCamera()
+            } else {
+                requestCameraPermission()
+            }
         }
 
         addButton.setOnClickListener {
@@ -107,31 +116,9 @@ class AddStoryActivity : AppCompatActivity() {
         resultLauncher.launch(intent)
     }
 
-    @SuppressLint("QueryPermissionsNeeded")
     private fun openCamera() {
-        if (hasCameraPermission()) {
-            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            takePictureIntent.resolveActivity(packageManager)?.also {
-                val photoFile: File? = try {
-                    createImageFile()
-                } catch (ex: IOException) {
-                    Log.e("AddStoryActivity", "Error occurred while creating the file", ex)
-                    null
-                }
-                photoFile?.also {
-                    val photoURI: Uri = FileProvider.getUriForFile(
-                        this,
-                        "com.example.aplikasistoryapp.fileprovider",
-                        it
-                    )
-                    photoUri = photoURI
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    resultLauncher.launch(takePictureIntent)
-                }
-            }
-        } else {
-            requestCameraPermission()
-        }
+        photoUri = getImageUri(this)
+        takePictureLauncher.launch(photoUri!!)
     }
 
     private fun hasCameraPermission(): Boolean {
@@ -164,18 +151,6 @@ class AddStoryActivity : AppCompatActivity() {
         }
     }
 
-    @Throws(IOException::class)
-    private fun createImageFile(): File {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-        return File.createTempFile(
-            "JPEG_${timeStamp}_",
-            ".jpg",
-            storageDir
-        ).apply {
-            currentPhotoPath = absolutePath
-        }
-    }
 
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -211,6 +186,7 @@ class AddStoryActivity : AppCompatActivity() {
 
         if (photoFile.length() > MAX_PHOTO_SIZE) {
             Toast.makeText(this, "Photo size exceeds 1MB", Toast.LENGTH_SHORT).show()
+            showLoading(false)
             return
         }
 
@@ -224,7 +200,10 @@ class AddStoryActivity : AppCompatActivity() {
                 token?.let {
                     addStoryViewModel.addStory(descriptionRequestBody, photoPart)
                 } ?: addStoryViewModel.addStoryGuest(descriptionRequestBody, photoPart)
-                finish()
+                setResult(Activity.RESULT_OK)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    finish()
+                }, 1000)
             } catch (e: HttpException) {
                 Log.e("AddStoryActivity", "HTTP Exception: ${e.code()}")
                 Toast.makeText(this@AddStoryActivity, "Error: ${e.message()}", Toast.LENGTH_SHORT).show()
@@ -239,10 +218,10 @@ class AddStoryActivity : AppCompatActivity() {
 
     private fun showLoading(isLoading: Boolean) {
         if (isLoading) {
-            loadingLayout.visibility = View.VISIBLE
+            loadingIndicator.visibility = View.VISIBLE
             addButton.isEnabled = false  // Disable button while loading
         } else {
-            loadingLayout.visibility = View.GONE
+            loadingIndicator.visibility = View.GONE
             addButton.isEnabled = true  // Enable button after loading finished
         }
     }

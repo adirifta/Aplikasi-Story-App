@@ -1,13 +1,16 @@
 package com.example.aplikasistoryapp.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.Injection
 import com.example.aplikasistoryapp.data.UserPreference
@@ -28,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var storyAdapter: StoryAdapter
     private lateinit var loadingIndicator: ProgressBar
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val storyViewModel: StoryViewModel by viewModels {
         ViewModelFactory(Injection.provideRepository(this))
@@ -39,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         loadingIndicator = findViewById(R.id.loadingIndicator)
-        loadingIndicator.visibility = View.VISIBLE
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
         setupRecyclerView()
 
         if (!isLoggedIn()) {
@@ -47,18 +51,52 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        observeStories()
+        observeViewModel()
+        setupListeners()
 
+        storyViewModel.fetchStories()
+
+        swipeRefreshLayout.setOnRefreshListener {
+            storyViewModel.fetchStories()
+        }
+    }
+
+    private fun setupRecyclerView() {
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        storyAdapter = StoryAdapter { story ->
+            val intent = Intent(this, DetailActivity::class.java).apply {
+                putExtra(DetailActivity.EXTRA_STORY_ID, story.id)
+                putExtra(DetailActivity.EXTRA_TOKEN, runBlocking { UserPreference.getInstance(dataStore).getUserToken().first() })
+            }
+            startActivity(intent)
+        }
+        binding.recyclerView.adapter = storyAdapter
+    }
+
+    private fun observeViewModel() {
+        storyViewModel.stories.observe(this) { storyResponse ->
+            storyResponse?.let {
+                Log.d("MainActivity", "Stories received: ${it.listStory.size}")
+                storyAdapter.submitList(it.listStory)
+                swipeRefreshLayout.isRefreshing = false
+            }
+        }
+
+        storyViewModel.isLoading.observe(this) { isLoading ->
+            loadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun setupListeners() {
         binding.btnAddStory.setOnClickListener {
             val intent = Intent(this, AddStoryActivity::class.java)
-            startActivityForResult(intent, ADD_STORY_REQUEST_CODE)
+            addStoryResultLauncher.launch(intent)
         }
 
         binding.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_settings -> {
-                    val intent = Intent(this, SettingsActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, SettingsActivity::class.java))
                     true
                 }
                 else -> false
@@ -68,37 +106,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        observeStories()
-    }
-
-    private fun setupRecyclerView() {
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        storyAdapter = StoryAdapter { story ->
-            val intent = Intent(this, DetailActivity::class.java)
-            intent.putExtra(DetailActivity.EXTRA_STORY_ID, story.id)
-            intent.putExtra(DetailActivity.EXTRA_TOKEN, runBlocking { UserPreference.getInstance(dataStore).getUserToken().first() })
-            startActivity(intent)
-        }
-        binding.recyclerView.adapter = storyAdapter
-    }
-
-    private fun observeStories() {
-        storyViewModel.stories.observe(this) { storyResponse ->
-            loadingIndicator.visibility = View.GONE
-            storyResponse?.let {
-                Log.d("MainActivity", "Stories received: ${storyResponse.listStory.size}")
-                storyAdapter.submitList(storyResponse.listStory)
-            }
-        }
-
-        storyViewModel.isLoading.observe(this) { isLoading ->
-            if (isLoading) {
-                loadingIndicator.visibility = View.VISIBLE
-            } else {
-                loadingIndicator.visibility = View.GONE
-            }
-        }
-
         storyViewModel.fetchStories()
     }
 
@@ -109,12 +116,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
 
-    companion object {
-        private const val ADD_STORY_REQUEST_CODE = 1
+    private val addStoryResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            storyViewModel.fetchStories()
+        }
     }
 }

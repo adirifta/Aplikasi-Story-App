@@ -72,4 +72,6 @@ dependencies {
     implementation (libs.lottie)
 
     implementation (libs.justifiedtextview)
+
+    implementation(libs.androidx.swiperefreshlayout)
 }
