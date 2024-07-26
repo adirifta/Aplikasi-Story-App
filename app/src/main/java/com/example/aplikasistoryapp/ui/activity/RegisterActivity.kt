@@ -80,10 +80,6 @@ class RegisterActivity : AppCompatActivity() {
             Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (password.length < 8) {
-            edRegisterPassword.error = "Password must be at least 8 characters"
-            return false
-        }
         return true
     }
 

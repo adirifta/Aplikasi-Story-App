@@ -16,7 +16,7 @@
     <string name="ic_logo">logo</string>
     <string name="photo">Gambar</string>
     <string name="loading">Memuat</string>
-    <string name="story_app">Story App</string>
+    <string name="story_app">Aplikasi Cerita</string>
     <string name="settings">Pengaturan</string>
     <string name="logout">Keluar</string>
     <string name="language">Pilih Bahasa</string>
@@ -29,4 +29,6 @@
     <string name="app_widget_description">Ini adalah deskripsi widget aplikasi</string>
     <string name="empty_text">TIDAK ADA DATA</string>
     <string name="item_widget">Item widget</string>
+    <string name="email_invalid_error">Alamat email salah</string>
+    <string name="password_length_error">Kata sandi minimal harus 8 karakter</string>
 </resources>

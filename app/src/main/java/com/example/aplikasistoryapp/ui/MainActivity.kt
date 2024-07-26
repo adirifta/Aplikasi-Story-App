@@ -22,7 +22,6 @@ import com.example.aplikasistoryapp.ui.activity.LoginActivity
 import com.example.aplikasistoryapp.ui.activity.SettingsActivity
 import com.example.aplikasistoryapp.ui.viewmodel.StoryViewModel
 import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.ViewModelFactory
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 
@@ -42,14 +41,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        loadingIndicator = findViewById(R.id.loadingIndicator)
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
-        setupRecyclerView()
-
-        if (!isLoggedIn()) {
-            navigateToLogin()
-            return
-        }
+        initViews()
+        checkLoginStatus()
 
         observeViewModel()
         setupListeners()
@@ -61,12 +54,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun initViews() {
+        loadingIndicator = findViewById(R.id.loadingIndicator)
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
+        setupRecyclerView()
+    }
+
     private fun setupRecyclerView() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         storyAdapter = StoryAdapter { story ->
             val intent = Intent(this, DetailActivity::class.java).apply {
                 putExtra(DetailActivity.EXTRA_STORY_ID, story.id)
-                putExtra(DetailActivity.EXTRA_TOKEN, runBlocking { UserPreference.getInstance(dataStore).getUserToken().first() })
+                putExtra(DetailActivity.EXTRA_TOKEN, getUserToken())
             }
             startActivity(intent)
         }
@@ -104,9 +103,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        storyViewModel.fetchStories()
+    private fun checkLoginStatus() {
+        if (!isLoggedIn()) {
+            navigateToLogin()
+        }
     }
 
     private fun isLoggedIn(): Boolean {
@@ -118,6 +118,10 @@ class MainActivity : AppCompatActivity() {
     private fun navigateToLogin() {
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
+    }
+
+    private fun getUserToken(): String? {
+        return runBlocking { UserPreference.getInstance(dataStore).getUserToken().firstOrNull() }
     }
 
     private val addStoryResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

@@ -28,4 +28,6 @@
     <string name="app_widget_description">This is an app widget description</string>
     <string name="item_widget">Item widget</string>
     <string name="empty_text">NO DATA</string>
+    <string name="email_invalid_error">Invalid email address</string>
+    <string name="password_length_error">Password must be at least 8 characters</string>
 </resources>

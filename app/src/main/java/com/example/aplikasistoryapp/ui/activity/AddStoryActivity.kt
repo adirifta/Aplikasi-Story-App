@@ -8,8 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
@@ -201,9 +199,10 @@ class AddStoryActivity : AppCompatActivity() {
                     addStoryViewModel.addStory(descriptionRequestBody, photoPart)
                 } ?: addStoryViewModel.addStoryGuest(descriptionRequestBody, photoPart)
                 setResult(Activity.RESULT_OK)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    finish()
-                }, 1000)
+
+                sendBroadcast(Intent("com.example.aplikasistoryapp.NEW_STORY_ADDED"))
+                finish()
+                Toast.makeText(this@AddStoryActivity, "Story uploaded successfully", Toast.LENGTH_SHORT).show()
             } catch (e: HttpException) {
                 Log.e("AddStoryActivity", "HTTP Exception: ${e.code()}")
                 Toast.makeText(this@AddStoryActivity, "Error: ${e.message()}", Toast.LENGTH_SHORT).show()

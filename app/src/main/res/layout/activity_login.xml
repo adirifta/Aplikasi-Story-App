@@ -41,7 +41,7 @@
         tools:alpha="100"
         tools:ignore="UnknownIdInLayout" />
 
-    <EditText
+    <com.example.aplikasistoryapp.ui.activity.CustomEditText
         android:id="@+id/ed_login_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
         tools:alpha="100"
         tools:ignore="Autofill" />
 
-    <EditText
+    <com.example.aplikasistoryapp.ui.activity.CustomEditText
         android:id="@+id/ed_login_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
