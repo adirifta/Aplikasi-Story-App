@@ -95,14 +95,15 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.core)
     testImplementation(libs.androidx.paging.common.ktx)
-    testImplementation(libs.robolectric)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.inline)
+    testImplementation (libs.androidx.core.testing)
+    testImplementation (libs.robolectric.v4103)
+    testImplementation (libs.mockito.core.v530)
+    testImplementation (libs.mockito.inline.v520)
 
     // UI Testing dependencies
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.test.espresso:espresso-idling-resource:3.5.1")
-    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation(libs.androidx.junit.v113)
+    androidTestImplementation(libs.androidx.espresso.core.v351)
+    androidTestImplementation(libs.androidx.espresso.idling.resource)
+    androidTestImplementation(libs.androidx.espresso.intents.v351)
+    androidTestImplementation(libs.androidx.espresso.contrib)
 }
