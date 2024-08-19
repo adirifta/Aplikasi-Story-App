@@ -19,7 +19,7 @@
             android:src="@drawable/ic_image"
             android:scaleType="centerCrop"
             android:layout_marginBottom="16dp"
-            android:contentDescription="@string/image"
+            android:contentDescription="@string/detail_photo"
             tools:ignore="ContentDescription" />
 
         <TextView
@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:textColor="@color/abu_hint"
+            android:textColor="@color/black"
             android:paddingBottom="8dp"
             tools:text="@string/story_date" />
 

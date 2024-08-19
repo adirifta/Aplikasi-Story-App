@@ -9,6 +9,7 @@
     <string name="story_title">Story Title</string>
     <string name="story_date">Story Date</string>
     <string name="image">Image</string>
+    <string name="detail_photo">Detailed photos of the story</string>
     <string name="description">Description</string>
     <string name="add_image">Add Image</string>
     <string name="show_more" tools:ignore="UnusedResources">Show more</string>

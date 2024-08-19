@@ -41,7 +41,7 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".ui.MapsActivity"
+            android:name=".ui.activity.MapsActivity"
             android:exported="false"
             android:label="@string/title_activity_maps" />
 
@@ -64,7 +64,7 @@
             android:name=".ui.activity.WelcomeActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.SplashScreen"
+            android:name=".ui.activity.SplashScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

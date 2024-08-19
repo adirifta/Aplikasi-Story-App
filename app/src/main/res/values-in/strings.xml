@@ -10,6 +10,7 @@
     <string name="story_title">Judul Cerita</string>
     <string name="story_date">Tanggal Cerita</string>
     <string name="image">Gambar</string>
+    <string name="detail_photo">Foto detail cerita</string>
     <string name="description">Deskripsi</string>
     <string name="add_image">Tambahkan Gambar</string>
     <string name="show_more">Tampilkan</string>

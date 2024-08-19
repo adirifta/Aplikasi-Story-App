@@ -19,6 +19,7 @@ import com.example.aplikasistoryapp.databinding.ActivityMainBinding
 import com.example.aplikasistoryapp.ui.activity.AddStoryActivity
 import com.example.aplikasistoryapp.ui.activity.DetailActivity
 import com.example.aplikasistoryapp.ui.activity.LoginActivity
+import com.example.aplikasistoryapp.ui.activity.MapsActivity
 import com.example.aplikasistoryapp.ui.activity.SettingsActivity
 import com.example.aplikasistoryapp.ui.viewmodel.StoryViewModel
 import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.ViewModelFactory

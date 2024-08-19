@@ -1,4 +1,4 @@
-package com.example.aplikasistoryapp.ui
+package com.example.aplikasistoryapp.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.UserPreference
 import com.example.aplikasistoryapp.data.dataStore
-import com.example.aplikasistoryapp.ui.activity.WelcomeActivity
+import com.example.aplikasistoryapp.ui.MainActivity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 

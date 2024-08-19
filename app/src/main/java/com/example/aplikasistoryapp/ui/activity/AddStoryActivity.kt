@@ -12,11 +12,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -45,18 +41,12 @@ import retrofit2.HttpException
 @Suppress("DEPRECATION")
 class AddStoryActivity : AppCompatActivity() {
 
-    private lateinit var descriptionEditText: EditText
-    private lateinit var addPhotoImageView: ImageView
-    private lateinit var addGalleryButton: Button
-    private lateinit var addCameraButton: Button
-    private lateinit var addButton: Button
-    private lateinit var locationCheckBox: CheckBox
-    private var photoUri: Uri? = null
-    private lateinit var loadingIndicator: ProgressBar
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var currentLocation: Location? = null
-
     private lateinit var binding: ActivityAddStoryBinding
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var photoUri: Uri? = null
+    private var currentLocation: Location? = null
+    private lateinit var checkboxAddLocation: ImageView
+    private var isLocationChecked = false
 
     private val addStoryViewModel: AddStoryViewModel by viewModels {
         AddViewModelFactory(Injection.provideRepository(this))
@@ -64,9 +54,17 @@ class AddStoryActivity : AppCompatActivity() {
 
     private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
         if (isSuccess) {
-            addPhotoImageView.setImageURI(photoUri)
+            binding.ivAddPhoto.setImageURI(photoUri)
         } else {
             photoUri = null
+        }
+    }
+
+    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            photoUri = data?.data ?: photoUri
+            binding.ivAddPhoto.setImageURI(photoUri)
         }
     }
 
@@ -75,22 +73,13 @@ class AddStoryActivity : AppCompatActivity() {
         binding = ActivityAddStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        descriptionEditText = findViewById(R.id.ed_add_description)
-        addPhotoImageView = findViewById(R.id.iv_add_photo)
-        addGalleryButton = findViewById(R.id.button_add_gallery)
-        addCameraButton = findViewById(R.id.button_add_camera)
-        addButton = findViewById(R.id.button_add)
-        locationCheckBox = findViewById(R.id.checkbox_add_location)
-        loadingIndicator = findViewById(R.id.loadingIndicator)
-        loadingIndicator.visibility = View.GONE
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        addGalleryButton.setOnClickListener {
+        binding.buttonAddGallery.setOnClickListener {
             openGallery()
         }
 
-        addCameraButton.setOnClickListener {
+        binding.buttonAddCamera.setOnClickListener {
             if (hasCameraPermission()) {
                 openCamera()
             } else {
@@ -98,18 +87,18 @@ class AddStoryActivity : AppCompatActivity() {
             }
         }
 
-        addButton.setOnClickListener {
-            if (locationCheckBox.isChecked) {
-                getCurrentLocation()
-            } else {
-                uploadStory()
-            }
+        checkboxAddLocation = binding.checkboxAddLocation
+        checkboxAddLocation.setOnClickListener {
+            toggleLocationCheckbox()
+        }
+
+        binding.buttonAdd.setOnClickListener {
+            uploadStory()
         }
 
         playAnimation()
 
-        val backButton: ImageView = findViewById(R.id.backButton)
-        backButton.setOnClickListener {
+        binding.backButton.setOnClickListener {
             finish()
         }
 
@@ -163,22 +152,12 @@ class AddStoryActivity : AppCompatActivity() {
             }
         }
 
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getCurrentLocation()  // Re-attempt to get location if permissions are granted
             } else {
                 Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
             }
-        }
-    }
-
-
-    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data: Intent? = result.data
-            photoUri = data?.data ?: photoUri
-            addPhotoImageView.setImageURI(photoUri)
         }
     }
 
@@ -196,7 +175,6 @@ class AddStoryActivity : AppCompatActivity() {
         }
         fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
             currentLocation = location
-            uploadStory()  // Proceed to upload story after getting location
         }
     }
 
@@ -208,11 +186,22 @@ class AddStoryActivity : AppCompatActivity() {
         )
     }
 
+    private fun toggleLocationCheckbox() {
+        isLocationChecked = !isLocationChecked
+        val drawableRes = if (isLocationChecked) R.drawable.ic_checked else R.drawable.ic_unchecked
+        checkboxAddLocation.setImageResource(drawableRes)
+
+        if (isLocationChecked) {
+            getCurrentLocation()
+        } else {
+            currentLocation = null
+        }
+    }
 
     private fun uploadStory() {
-        val description = descriptionEditText.text.toString().trim()
+        val description = binding.edAddDescription.text.toString().trim()
         if (description.isEmpty()) {
-            descriptionEditText.error = "Description is required"
+            binding.edAddDescription.error = "Description is required"
             return
         }
 
@@ -223,60 +212,67 @@ class AddStoryActivity : AppCompatActivity() {
 
         showLoading(true)
 
-        val contentResolver = contentResolver
-        val inputStream = contentResolver.openInputStream(photoUri!!)
-        val photoFile = createTempFile()
+        try {
+            val contentResolver = contentResolver
+            val inputStream = contentResolver.openInputStream(photoUri!!)
+            val photoFile = createTempFile()
 
-        inputStream?.use { input ->
-            photoFile.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-
-        if (photoFile.length() > MAX_PHOTO_SIZE) {
-            Toast.makeText(this, "Photo size exceeds 1MB", Toast.LENGTH_SHORT).show()
-            showLoading(false)
-            return
-        }
-
-        val descriptionRequestBody = description.toRequestBody("text/plain".toMediaTypeOrNull())
-        val photoRequestBody = photoFile.asRequestBody("image/*".toMediaTypeOrNull())
-        val photoPart = MultipartBody.Part.createFormData("photo", photoFile.name, photoRequestBody)
-        val latRequestBody = currentLocation?.latitude?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
-        val lonRequestBody = currentLocation?.longitude?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
-
-        lifecycleScope.launch {
-            val token = UserPreference.getInstance(dataStore).getUserToken().firstOrNull()
-            try {
-                if (token != null) {
-                    addStoryViewModel.addStory(descriptionRequestBody, photoPart, latRequestBody, lonRequestBody)
-                } else {
-                    addStoryViewModel.addStoryGuest(descriptionRequestBody, photoPart, latRequestBody, lonRequestBody)
+            inputStream?.use { input ->
+                photoFile.outputStream().use { output ->
+                    input.copyTo(output)
                 }
-                setResult(Activity.RESULT_OK)
-
-                sendBroadcast(Intent("com.example.aplikasistoryapp.NEW_STORY_ADDED"))
-                finish()
-                Toast.makeText(this@AddStoryActivity, "Story uploaded successfully", Toast.LENGTH_SHORT).show()
-            } catch (e: HttpException) {
-                Log.e("AddStoryActivity", "HTTP Exception: ${e.code()}")
-                Toast.makeText(this@AddStoryActivity, "Error: ${e.message()}", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                Log.e("AddStoryActivity", "Error uploading story", e)
-                Toast.makeText(this@AddStoryActivity, "Error uploading story", Toast.LENGTH_SHORT).show()
-            } finally {
-                showLoading(false)
             }
+
+            if (photoFile.length() > MAX_PHOTO_SIZE) {
+                Toast.makeText(this, "Photo size exceeds 1MB", Toast.LENGTH_SHORT).show()
+                showLoading(false)
+                return
+            }
+
+            val descriptionRequestBody = description.toRequestBody("text/plain".toMediaTypeOrNull())
+            val photoRequestBody = photoFile.asRequestBody("image/*".toMediaTypeOrNull())
+            val photoPart = MultipartBody.Part.createFormData("photo", photoFile.name, photoRequestBody)
+
+            val latRequestBody = currentLocation?.latitude?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+            val lonRequestBody = currentLocation?.longitude?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+
+            lifecycleScope.launch {
+                val token = UserPreference.getInstance(dataStore).getUserToken().firstOrNull()
+                try {
+                    if (token != null) {
+                        addStoryViewModel.addStory(descriptionRequestBody, photoPart, latRequestBody, lonRequestBody)
+                    } else {
+                        addStoryViewModel.addStoryGuest(descriptionRequestBody, photoPart, latRequestBody, lonRequestBody)
+                    }
+                    setResult(Activity.RESULT_OK)
+
+                    sendBroadcast(Intent("com.example.aplikasistoryapp.NEW_STORY_ADDED"))
+                    finish()
+                    Toast.makeText(this@AddStoryActivity, "Story uploaded successfully", Toast.LENGTH_SHORT).show()
+                } catch (e: HttpException) {
+                    Log.e("AddStoryActivity", "HTTP Exception: ${e.code()}")
+                    Toast.makeText(this@AddStoryActivity, "Error: ${e.message()}", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Log.e("AddStoryActivity", "Error uploading story", e)
+                    Toast.makeText(this@AddStoryActivity, "Error uploading story", Toast.LENGTH_SHORT).show()
+                } finally {
+                    showLoading(false)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AddStoryActivity", "File processing error", e)
+            Toast.makeText(this, "File processing error: ${e.message}", Toast.LENGTH_SHORT).show()
+            showLoading(false)
         }
     }
 
     private fun showLoading(isLoading: Boolean) {
         if (isLoading) {
-            loadingIndicator.visibility = View.VISIBLE
-            addButton.isEnabled = false  // Disable button while loading
+            binding.loadingIndicator.visibility = View.VISIBLE
+            binding.buttonAdd.isEnabled = false
         } else {
-            loadingIndicator.visibility = View.GONE
-            addButton.isEnabled = true  // Enable button after loading finished
+            binding.loadingIndicator.visibility = View.GONE
+            binding.buttonAdd.isEnabled = true
         }
     }
 
@@ -288,12 +284,21 @@ class AddStoryActivity : AppCompatActivity() {
 
     private fun playAnimation() {
         val textTitleAnimator = ObjectAnimator.ofFloat(binding.edAddDescription, View.ALPHA, 0f, 1f).setDuration(1000)
-        val galleryButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAddGallery, View.ALPHA, 0f, 1f).setDuration(1000)
-        val cameraButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAddCamera, View.ALPHA, 0f, 1f).setDuration(1000)
-        val addButtonAnimator = ObjectAnimator.ofFloat(binding.buttonAdd, View.ALPHA, 0f, 1f).setDuration(1000)
+        val buttonAddAnimator = ObjectAnimator.ofFloat(binding.buttonAdd, View.ALPHA, 0f, 1f).setDuration(1000)
+        val buttonAddGalleryAnimator = ObjectAnimator.ofFloat(binding.buttonAddGallery, View.ALPHA, 0f, 1f).setDuration(1000)
+        val buttonAddCameraAnimator = ObjectAnimator.ofFloat(binding.buttonAddCamera, View.ALPHA, 0f, 1f).setDuration(1000)
+        val checkboxAddLocationAnimator = ObjectAnimator.ofFloat(binding.checkboxAddLocation, View.ALPHA, 0f, 1f).setDuration(700)
+        val ivAddPhotoAnimator = ObjectAnimator.ofFloat(binding.ivAddPhoto, View.ALPHA, 0f, 1f).setDuration(500)
 
         AnimatorSet().apply {
-            playSequentially(textTitleAnimator, galleryButtonAnimator, cameraButtonAnimator, addButtonAnimator)
+            playSequentially(
+                textTitleAnimator,
+                buttonAddGalleryAnimator,
+                buttonAddCameraAnimator,
+                checkboxAddLocationAnimator,
+                ivAddPhotoAnimator,
+                buttonAddAnimator
+            )
             start()
         }
     }

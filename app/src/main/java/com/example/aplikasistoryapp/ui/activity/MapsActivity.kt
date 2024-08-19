@@ -1,4 +1,4 @@
-package com.example.aplikasistoryapp.ui
+package com.example.aplikasistoryapp.ui.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -74,13 +74,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        progressBar = findViewById(R.id.loadingIndicator) // Initialize ProgressBar
+        progressBar = findViewById(R.id.loadingIndicator)
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        showLoading(true) // Show ProgressBar while loading
+        showLoading(true)
         mapsViewModel.getStoriesWithLocation()
     }
 
@@ -89,7 +89,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setupMapSettings()
 
         mapsViewModel.storyResponse.observe(this) { storyResponse ->
-            showLoading(false) // Hide ProgressBar once data is loaded
+            showLoading(false)
             if (!storyResponse.error!!) {
                 Log.d("MapsActivity", "Stories received: ${storyResponse.listStory.size}")
                 addMarkers(storyResponse.listStory)
