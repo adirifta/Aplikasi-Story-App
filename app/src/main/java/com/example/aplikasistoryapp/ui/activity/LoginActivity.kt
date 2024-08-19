@@ -113,4 +113,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    fun isLoading(): Boolean {
+        return loginViewModel.isLoading.value ?: false
+    }
 }

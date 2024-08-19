@@ -1,6 +1,9 @@
+import org.gradle.api.internal.DocumentationRegistry.BASE_URL
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
 android {
@@ -15,6 +18,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "BASE_URL", "\"${BASE_URL}\"")
     }
 
     buildTypes {
@@ -28,6 +33,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -40,38 +46,45 @@ android {
 
 dependencies {
 
+    // Core AndroidX dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 
-    //Retrofit
+    // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    implementation (libs.logging.interceptor)
-    implementation (libs.adapter.rxjava2)
-    implementation (libs.logging.interceptor.v491)
+    implementation(libs.logging.interceptor)
+    implementation(libs.adapter.rxjava2)
 
-    //DataStore
-    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    // DataStore
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.datastore.preferences)
 
-    //Glide
-    implementation (libs.glide)
-    annotationProcessor (libs.compiler)
-    implementation (libs.kotlinx.coroutines.android)
+    // Glide
+    implementation(libs.glide)
+    annotationProcessor(libs.compiler)
 
-    implementation (libs.okhttp)
-    implementation (libs.logging.interceptor.v490)
+    // Paging
+    implementation(libs.androidx.paging.runtime.ktx)
 
-    //Lottie Animation
-    implementation (libs.lottie)
+    // Maps
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
 
-    implementation (libs.justifiedtextview)
+    // Lottie Animation
+    implementation(libs.lottie)
 
+    // Other Libraries
+    implementation(libs.justifiedtextview)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.okhttp)
+
+    // Testing
+    testImplementation(libs.junit)
+
+    
 }

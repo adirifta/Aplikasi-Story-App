@@ -5,14 +5,19 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.UserPreference
 import com.example.aplikasistoryapp.data.dataStore
-import kotlinx.coroutines.launch
+import com.example.aplikasistoryapp.ui.viewmodel.SettingsViewModel
 import android.provider.Settings
+import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.SettingsViewModelFactory
 
 class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var settingsViewModel: SettingsViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -20,6 +25,11 @@ class SettingsActivity : AppCompatActivity() {
         val backButton: ImageView = findViewById(R.id.backButton)
         val languageArrow: ImageView = findViewById(R.id.languageArrow)
         val logoutButton: Button = findViewById(R.id.logoutButton)
+
+        settingsViewModel = ViewModelProvider(
+            this,
+            SettingsViewModelFactory(UserPreference.getInstance(dataStore))
+        ).get(SettingsViewModel::class.java)
 
         backButton.setOnClickListener {
             finish()
@@ -29,15 +39,25 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
         }
 
-        // Handle logout action
-        logoutButton.setOnClickListener {
-            lifecycleScope.launch {
-                UserPreference.getInstance(dataStore).clearUserToken()
+        // Observe logout status
+        settingsViewModel.logoutStatus.observe(this, Observer { isSuccess ->
+            if (isSuccess) {
                 val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
                 finish()
+            } else {
+                // Handle error
             }
+        })
+
+        // Handle logout action
+        logoutButton.setOnClickListener {
+            settingsViewModel.logout()
         }
+    }
+
+    fun isLoading(): Boolean {
+        return settingsViewModel.isLoading.value ?: false
     }
 }

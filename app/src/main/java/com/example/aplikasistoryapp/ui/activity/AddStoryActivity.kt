@@ -6,12 +6,14 @@ import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -21,6 +23,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import androidx.lifecycle.lifecycleScope
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.Injection
@@ -30,6 +33,9 @@ import com.example.aplikasistoryapp.databinding.ActivityAddStoryBinding
 import com.example.aplikasistoryapp.ui.getImageUri
 import com.example.aplikasistoryapp.ui.viewmodel.AddStoryViewModel
 import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.AddViewModelFactory
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.OnSuccessListener
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -45,8 +51,11 @@ class AddStoryActivity : AppCompatActivity() {
     private lateinit var addGalleryButton: Button
     private lateinit var addCameraButton: Button
     private lateinit var addButton: Button
+    private lateinit var locationCheckBox: CheckBox
     private var photoUri: Uri? = null
     private lateinit var loadingIndicator: ProgressBar
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var currentLocation: Location? = null
 
     private lateinit var binding: ActivityAddStoryBinding
 
@@ -72,8 +81,11 @@ class AddStoryActivity : AppCompatActivity() {
         addGalleryButton = findViewById(R.id.button_add_gallery)
         addCameraButton = findViewById(R.id.button_add_camera)
         addButton = findViewById(R.id.button_add)
+        locationCheckBox = findViewById(R.id.checkbox_add_location)
         loadingIndicator = findViewById(R.id.loadingIndicator)
         loadingIndicator.visibility = View.GONE
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         addGalleryButton.setOnClickListener {
             openGallery()
@@ -88,7 +100,11 @@ class AddStoryActivity : AppCompatActivity() {
         }
 
         addButton.setOnClickListener {
-            uploadStory()
+            if (locationCheckBox.isChecked) {
+                getCurrentLocation()
+            } else {
+                uploadStory()
+            }
         }
 
         playAnimation()
@@ -147,6 +163,15 @@ class AddStoryActivity : AppCompatActivity() {
                 Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show()
             }
         }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()  // Re-attempt to get location if permissions are granted
+            } else {
+                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
 
@@ -157,6 +182,33 @@ class AddStoryActivity : AppCompatActivity() {
             addPhotoImageView.setImageURI(photoUri)
         }
     }
+
+    private fun getCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestLocationPermissions()
+            return
+        }
+        fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
+            currentLocation = location
+            uploadStory()  // Proceed to upload story after getting location
+        }
+    }
+
+    private fun requestLocationPermissions() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+            REQUEST_LOCATION_PERMISSION
+        )
+    }
+
 
     private fun uploadStory() {
         val description = descriptionEditText.text.toString().trim()
@@ -191,13 +243,17 @@ class AddStoryActivity : AppCompatActivity() {
         val descriptionRequestBody = description.toRequestBody("text/plain".toMediaTypeOrNull())
         val photoRequestBody = photoFile.asRequestBody("image/*".toMediaTypeOrNull())
         val photoPart = MultipartBody.Part.createFormData("photo", photoFile.name, photoRequestBody)
+        val latRequestBody = currentLocation?.latitude?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+        val lonRequestBody = currentLocation?.longitude?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
 
         lifecycleScope.launch {
             val token = UserPreference.getInstance(dataStore).getUserToken().firstOrNull()
             try {
-                token?.let {
-                    addStoryViewModel.addStory(descriptionRequestBody, photoPart)
-                } ?: addStoryViewModel.addStoryGuest(descriptionRequestBody, photoPart)
+                if (token != null) {
+                    addStoryViewModel.addStory(descriptionRequestBody, photoPart, latRequestBody, lonRequestBody)
+                } else {
+                    addStoryViewModel.addStoryGuest(descriptionRequestBody, photoPart, latRequestBody, lonRequestBody)
+                }
                 setResult(Activity.RESULT_OK)
 
                 sendBroadcast(Intent("com.example.aplikasistoryapp.NEW_STORY_ADDED"))
@@ -228,6 +284,7 @@ class AddStoryActivity : AppCompatActivity() {
     companion object {
         private const val MAX_PHOTO_SIZE = 1 * 1024 * 1024 // 1MB
         private const val REQUEST_CAMERA_PERMISSION = 101
+        private const val REQUEST_LOCATION_PERMISSION = 102
     }
 
     private fun playAnimation() {

@@ -5,6 +5,8 @@
         <item name="android:statusBarColor">@color/blue</item>
     </style>
 
+    <style name="Base.Theme.MyGoogleMaps" parent="Theme.Material3.DayNight"/>
+
     <style name="Theme.AplikasiStoryApp" parent="Base.Theme.AplikasiStoryApp" />
 
     <style name="Theme.AplikasiStoryApp.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault" tools:ignore="UnusedResources">

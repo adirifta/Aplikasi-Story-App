@@ -31,4 +31,12 @@
     <string name="item_widget">Item widget</string>
     <string name="email_invalid_error">Alamat email salah</string>
     <string name="password_length_error">Kata sandi minimal harus 8 karakter</string>
+    <string name="title_activity_maps">Peta</string>
+    <string name="retry">Coba lagi</string>
+    <string name="add_location">Lokasi terkini</string>
+
+    <string name="normal_type">Normal</string>
+    <string name="satellite_type">Satelit</string>
+    <string name="terrain_type">Medan</string>
+    <string name="hybrid_type">Hybrid</string>
 </resources>

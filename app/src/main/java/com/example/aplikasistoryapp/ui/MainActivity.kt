@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         initViews()
         checkLoginStatus()
-
+        setupRecyclerView()
         observeViewModel()
         setupListeners()
 
@@ -55,9 +55,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        loadingIndicator = findViewById(R.id.loadingIndicator)
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
-        setupRecyclerView()
+        loadingIndicator = findViewById(R.id.loadingIndicator)
     }
 
     private fun setupRecyclerView() {
@@ -69,20 +68,22 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-        binding.recyclerView.adapter = storyAdapter
+
+        binding.recyclerView.adapter = storyAdapter.withLoadStateFooter(
+            footer = LoadingStateAdapter { storyAdapter.retry() }
+        )
+
+//        binding.recyclerView.adapter = storyAdapter
     }
 
     private fun observeViewModel() {
-        storyViewModel.stories.observe(this) { storyResponse ->
-            storyResponse?.let {
-                Log.d("MainActivity", "Stories received: ${it.listStory.size}")
-                storyAdapter.submitList(it.listStory)
-                swipeRefreshLayout.isRefreshing = false
-            }
+        storyViewModel.stories.observe(this) { pagingData ->
+            storyAdapter.submitData(lifecycle, pagingData)
         }
 
         storyViewModel.isLoading.observe(this) { isLoading ->
             loadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
+            swipeRefreshLayout.isRefreshing = isLoading
         }
     }
 
@@ -94,6 +95,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.action_maps -> {
+                    startActivity(Intent(this, MapsActivity::class.java))
+                    true
+                }
                 R.id.action_settings -> {
                     startActivity(Intent(this, SettingsActivity::class.java))
                     true

@@ -31,19 +31,20 @@ internal class StackRemoteViewsFactory(private val mContext: Context) : RemoteVi
         val storyRepository = StoryRepository.getInstance(apiService)
 
         runBlocking {
-            withContext(Dispatchers.IO) {
-                try {
-                    val response = storyRepository.getStories()
-                    if (response.listStory.isNotEmpty()) {
-                        mWidgetItems.clear()
-                        mWidgetItems.addAll(response.listStory)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+            try {
+                // Use a method that returns a List<ListStoryItem>
+                val response = storyRepository.getStoriesAsList() // Ensure this method returns List<ListStoryItem>
+                if (response.isNotEmpty()) {
+                    mWidgetItems.clear()
+                    mWidgetItems.addAll(response)
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
+
+
 
     override fun onDestroy() {
         mWidgetItems.clear()
