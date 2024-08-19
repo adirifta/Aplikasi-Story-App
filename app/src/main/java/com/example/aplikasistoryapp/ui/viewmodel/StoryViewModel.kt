@@ -9,7 +9,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.aplikasistoryapp.data.repository.StoryRepository
 import com.example.aplikasistoryapp.data.response.ListStoryItem
-import com.example.aplikasistoryapp.data.response.StoryResponse
 import kotlinx.coroutines.launch
 
 class StoryViewModel(private val storyRepository: StoryRepository) : ViewModel() {

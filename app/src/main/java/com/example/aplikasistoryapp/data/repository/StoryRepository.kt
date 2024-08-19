@@ -1,7 +1,6 @@
 package com.example.aplikasistoryapp.data.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData

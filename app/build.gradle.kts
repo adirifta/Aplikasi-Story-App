@@ -42,6 +42,11 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    @Suppress("UnstableApiUsage")
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -65,6 +70,7 @@ dependencies {
 
     // Glide
     implementation(libs.glide)
+    androidTestImplementation(project(":app"))
     annotationProcessor(libs.compiler)
 
     // Paging
@@ -85,6 +91,18 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.core)
+    testImplementation(libs.androidx.paging.common.ktx)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
 
-    
+    // UI Testing dependencies
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-idling-resource:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
 }

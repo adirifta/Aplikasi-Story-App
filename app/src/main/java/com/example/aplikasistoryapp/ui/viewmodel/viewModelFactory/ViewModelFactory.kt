@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.aplikasistoryapp.data.repository.StoryRepository
 import com.example.aplikasistoryapp.ui.viewmodel.StoryViewModel
 
+@Suppress("UNCHECKED_CAST")
 class ViewModelFactory(private val storyRepository: StoryRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(StoryViewModel::class.java)) {

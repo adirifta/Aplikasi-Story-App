@@ -23,7 +23,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import androidx.lifecycle.lifecycleScope
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.Injection
@@ -35,7 +34,6 @@ import com.example.aplikasistoryapp.ui.viewmodel.AddStoryViewModel
 import com.example.aplikasistoryapp.ui.viewmodel.viewModelFactory.AddViewModelFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.OnSuccessListener
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -44,6 +42,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 
+@Suppress("DEPRECATION")
 class AddStoryActivity : AppCompatActivity() {
 
     private lateinit var descriptionEditText: EditText

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplikasistoryapp.R
 import com.example.aplikasistoryapp.data.UserPreference
@@ -29,7 +28,7 @@ class SettingsActivity : AppCompatActivity() {
         settingsViewModel = ViewModelProvider(
             this,
             SettingsViewModelFactory(UserPreference.getInstance(dataStore))
-        ).get(SettingsViewModel::class.java)
+        )[SettingsViewModel::class.java]
 
         backButton.setOnClickListener {
             finish()
@@ -40,7 +39,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // Observe logout status
-        settingsViewModel.logoutStatus.observe(this, Observer { isSuccess ->
+        settingsViewModel.logoutStatus.observe(this) { isSuccess ->
             if (isSuccess) {
                 val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -49,7 +48,7 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 // Handle error
             }
-        })
+        }
 
         // Handle logout action
         logoutButton.setOnClickListener {
