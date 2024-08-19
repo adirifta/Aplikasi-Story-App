@@ -2,12 +2,9 @@ package com.example.aplikasistoryapp.ui.viewmodel
 
 import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
 import androidx.recyclerview.widget.ListUpdateCallback
 import com.example.aplikasistoryapp.DataDummy
 import com.example.aplikasistoryapp.MainDispatcherRule
@@ -99,23 +96,6 @@ class StoryViewModelTest {
         differ.submitData(actualStories)
 
         Assert.assertEquals(0, differ.snapshot().size)
-    }
-}
-
-@Suppress("SameReturnValue")
-class StoryPagingSource : PagingSource<Int, LiveData<List<ListStoryItem>>>() {
-    companion object {
-        fun snapshot(items: List<ListStoryItem>): PagingData<ListStoryItem> {
-            return PagingData.from(items)
-        }
-    }
-
-    override fun getRefreshKey(state: PagingState<Int, LiveData<List<ListStoryItem>>>): Int {
-        return 0
-    }
-
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, LiveData<List<ListStoryItem>>> {
-        return LoadResult.Page(emptyList(), 0, 1)
     }
 }
 
